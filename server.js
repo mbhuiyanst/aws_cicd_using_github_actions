@@ -12,6 +12,15 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Optional: Serve other routes directly (handled by static middleware above)
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'about.html'));
+});
+
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'contact.html'));
+});
+
 // Example of dynamic content with routes
 app.get('/about', (req, res) => {
   res.send('About Us Page');
