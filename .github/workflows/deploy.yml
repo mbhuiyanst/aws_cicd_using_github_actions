@@ -1,0 +1,47 @@
+name: Deploy Node.js App to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to EC2 Instance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Deploy Node.js App on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+            echo "🔄 Pulling latest changes from GitHub..."
+
+            # If the directory exists, cd into it, else clone the repo
+            if [ -d "~/nodejs-app" ]; then
+              cd ~/nodejs-app
+              git pull origin main
+            else
+              echo "Cloning the repository..."
+              git clone https://github.com/${{ github.repository }} ~/nodejs-app
+              cd ~/nodejs-app
+            fi
+
+            echo "📦 Installing dependencies..."
+            npm install
+
+            echo "🛑 Stopping existing Node.js process..."
+            pkill node || echo "No running node process found"
+
+            echo "🚀 Starting Node.js app..."
+            nohup node server.js > output.log 2>&1 &
+
+            echo "✅ Deployment complete!"
+          EOF

@@ -1,0 +1,12 @@
+/node_modules
+# Node.js dependencies
+node_modules/
+
+# Logs
+npm-debug.log
+
+# Environment variables
+.env
+
+# Other common exclusions
+.DS_Store
